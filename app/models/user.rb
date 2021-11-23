@@ -18,6 +18,6 @@
 #
 class User < ApplicationRecord
   validates :email, uniqueness: true
-  validates :username, uniqueness: true
+  validates :username, uniqueness: true, presence: true
   validates :first_name, presence: true
 end
