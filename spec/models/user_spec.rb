@@ -64,4 +64,27 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
   end
+
+  describe "email" do
+    it "is valid" do
+      VALID_EMAILS = ["f.o.o.b.a.r@example.com", "foo+bar@example.com", "foo.bar@sub.example.co.id" ]
+      user = create_a_user
+      expect(user).to be_valid
+
+      VALID_EMAILS.each do |email|
+        user.email = email
+        expect(user).to be_valid
+      end
+    end
+
+    it "is invalid" do
+      INVALID_EMAILS = ["", "foo.bar", "foo.bar#example.com"]
+      user = create_a_user
+
+      INVALID_EMAILS.each do |email|
+        user.email = email
+        expect(user).not_to be_valid
+      end
+    end
+  end
 end
