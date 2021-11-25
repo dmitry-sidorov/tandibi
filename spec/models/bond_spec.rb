@@ -25,7 +25,7 @@ RSpec.describe Bond, type: :model do
     it "should validate the state correctly" do
       friend = User.new
       user = User.new
-      bond = Bond.new(user_id: user.id, friend_id: friend.id)
+      bond = Bond.new(user: user, friend: friend)
 
       expect(bond).not_to be_valid
       Bond::STATES.each do |state|
