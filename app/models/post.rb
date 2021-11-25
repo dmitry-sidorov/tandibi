@@ -23,4 +23,6 @@ class Post < ApplicationRecord
   belongs_to :postable, polymorphic: true
   belongs_to :user
   belongs_to :thread, class_name: "Post", optional: true
+
+  has_many :pictures
 end

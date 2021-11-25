@@ -27,6 +27,11 @@ RSpec.describe User, type: :model do
     )
   end
 
+  def create_users_list (quantity)
+    raise Exception.new "Quantity must be greater then 0" if quantity < 1
+    [*1..quantity].map { |item| create_a_user }
+  end
+
   EMAIL = "adam@example.org"
 
   describe "#valid?" do
@@ -85,6 +90,37 @@ RSpec.describe User, type: :model do
         user.email = email
         expect(user).not_to be_valid
       end
+    end
+  end
+
+  describe "#following" do
+    it "can list all  of the user's followings" do
+      user = create_a_user
+      friends = create_users_list(3)
+      states = [Bond::FOLLOWING, Bond::FOLLOWING, Bond::REQUESTING]
+      states.each_with_index { |state, i| Bond.create(user: user, friend: friends[i], state: state) }
+      
+      expect(user.followings).to include(friends.first, friends.second)
+      expect(user.follow_requests).to include(friends.last)
+    end
+  end
+
+  describe "#followers" do
+    it "can list all of the user's followers" do
+      users = create_users_list(2)
+      followers_1 = create_users_list(2)
+      followers_2 = create_users_list(2)
+      followers_1.each do |follower|
+        Bond.create(user: follower, friend: users.first, state: Bond::FOLLOWING)
+      end
+
+      Bond.create(user: followers_2.first, friend: users.second, state: Bond::FOLLOWING)
+      Bond.create(user: followers_2.second, friend: users.second, state: Bond::REQUESTING)
+
+      expect(users.first.followers).to eq(followers_1)
+      expect(users.second.followers).to eq([followers_2.first])
+
+
     end
   end
 end
