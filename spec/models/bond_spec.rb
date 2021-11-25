@@ -37,6 +37,8 @@ RSpec.describe Bond, type: :model do
     end
   end
 
+  # TEST COMMIT FOR GITLAB
+
   describe "#save" do
     context "when complete data is given" do
       it "can be persisted" do
