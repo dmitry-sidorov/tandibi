@@ -19,6 +19,6 @@
 FactoryBot.define do
   factory :sight do
     place { build(:place) }
-    activity_type { "checkin" }
+    activity_type { Sight::CHECKIN }
   end
 end
