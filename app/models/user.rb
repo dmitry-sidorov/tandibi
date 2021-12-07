@@ -37,4 +37,10 @@ class User < ApplicationRecord
     through: :inward_bonds,
     source: :user
 
+  before_save :ensure_proper_name_case
+
+  private
+    def ensure_proper_name_case
+      self.first_name = first_name.capitalize
+    end
 end

@@ -19,31 +19,23 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  def create_a_user(email: "#{SecureRandom.hex(4)}@example.org")
-    User.create!(
-      first_name: "Adam",
-      email: email,
-      username: SecureRandom.hex(4)
-    )
-  end
-
   def create_users_list (quantity)
     raise Exception.new "Quantity must be greater then 0" if quantity < 1
-    [*1..quantity].map { |item| create_a_user }
+    [*1..quantity].map { |item| create(:user) }
   end
 
   EMAIL = "adam@example.org"
 
   describe "#valid?" do
     it "is valid when email is unique" do
-      user1 = create_a_user
-      user2 = create_a_user
+      user1 = create(:user)
+      user2 = create(:user)
       expect(user2.email).not_to be user1.email
       expect(user2).to be_valid
     end
 
     it "is invalid if the email is taken" do
-      create_a_user(email: EMAIL)
+      create(:user, email: EMAIL)
       user = User.new
       user.email = EMAIL
       expect(user).not_to be_valid
@@ -61,7 +53,7 @@ RSpec.describe User, type: :model do
     end
 
     it "is invalid if user's first name is blank" do
-      user = create_a_user
+      user = create(:user)
       expect(user).to be_valid
       user.first_name = ""
       expect(user).not_to be_valid
@@ -73,7 +65,7 @@ RSpec.describe User, type: :model do
   describe "email" do
     it "is valid" do
       VALID_EMAILS = ["f.o.o.b.a.r@example.com", "foo+bar@example.com", "foo.bar@sub.example.co.id" ]
-      user = create_a_user
+      user = create(:user)
       expect(user).to be_valid
 
       VALID_EMAILS.each do |email|
@@ -84,7 +76,7 @@ RSpec.describe User, type: :model do
 
     it "is invalid" do
       INVALID_EMAILS = ["", "foo.bar", "foo.bar#example.com"]
-      user = create_a_user
+      user = create(:user)
 
       INVALID_EMAILS.each do |email|
         user.email = email
@@ -95,7 +87,7 @@ RSpec.describe User, type: :model do
 
   describe "#following" do
     it "can list all  of the user's followings" do
-      user = create_a_user
+      user = create(:user)
       friends = create_users_list(3)
       states = [Bond::FOLLOWING, Bond::FOLLOWING, Bond::REQUESTING]
       states.each_with_index { |state, i| Bond.create(user: user, friend: friends[i], state: state) }
@@ -121,6 +113,17 @@ RSpec.describe User, type: :model do
       expect(users.second.followers).to eq([followers_2.first])
 
 
+    end
+  end
+
+  describe "#save" do
+    it "capitalized the name correctly" do
+      user = create(:user)
+      user.first_name = "AdaM"
+      user.last_name = "van der Berg"
+      user.save
+      expect(user.first_name).to eq "Adam"
+      expect(user.last_name).to eq "van der Berg"
     end
   end
 end
